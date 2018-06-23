@@ -63,8 +63,7 @@ Non-trainable params: 64
 
 The used model includes only four 2d convolutional layers followed by two fully connected layers. The output is categorial to maximaze output separation. It has total number of parameters of aroud 2 Mega weights.
 
-Using this shallow model I achieved a training performance of 0.8747 and validation performance of 0.8262. On the testing set
-the reported performance was llllll.
+Using this shallow model I achieved a training performance of 0.8747 and validation performance of 0.8262. On the testing set to be reported.
 
 
 
