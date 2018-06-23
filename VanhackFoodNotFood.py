@@ -17,7 +17,7 @@ from keras.preprocessing.image import ImageDataGenerator
 
 from keras.models import Sequential
 from keras.layers import Conv2D, MaxPooling2D
-from keras.layers import Activation, Dropout, Flatten, Dense, GlobalAveragePooling2D
+from keras.layers import Activation, Dropout, Flatten, Dense, GlobalAveragePooling2D, BatchNormalization
 from keras import metrics
 from keras.layers import  activations
 
@@ -42,7 +42,7 @@ img_height = 224
 nb_train_samples = 3000
 nb_validation_samples = 1000
 nb_test_samples = 1000
-epochs = 50
+epochs = 10
 batch_size = 16
 
 num_classes = 2
@@ -85,30 +85,36 @@ test_generator = test_datagen.flow_from_directory(
 # base_model = keras.models.load_model('mobilenet_v2.h5', custom_objects={
 #                    'relu6': keras.applications.mobilenet.relu6})
 
-base_model = InceptionV3(weights='imagenet', include_top=False)
+# base_model = InceptionV3(weights='imagenet', include_top=False)
+# 
+# 
+# x = base_model.output
+# predictions = Dense(2, activation='softmax', kernel_initializer = 'he_normal')(x)
+# 
+# model = Model(inputs=base_model.input, outputs=predictions)
 
+input_shape = (img_width, img_height, 3)
+   
+model = Sequential()
+model.add(Conv2D(32, (3, 3), input_shape=input_shape, activation='relu', kernel_initializer = 'he_normal'))
+model.add(MaxPooling2D(pool_size=(2, 2)))
+model.add(BatchNormalization())
 
-x = base_model.output
-predictions = Dense(2, activation='softmax', kernel_initializer = 'he_normal')(x)
-
-model = Model(inputs=base_model.input, outputs=predictions)
-
-# input_shape = (img_width, img_height, 3)
-#   
-# model = Sequential()
-# model.add(Conv2D(32, (3, 3), input_shape=input_shape, activation='relu', kernel_initializer = 'he_normal'))
-# model.add(MaxPooling2D(pool_size=(2, 2)))
-#   
-# model.add(Conv2D(32, (3, 3), input_shape=input_shape, activation='relu', kernel_initializer = 'he_normal'))
-# model.add(MaxPooling2D(pool_size=(2, 2)))
-#   
-# model.add(Conv2D(64, (3, 3), input_shape=input_shape, activation='relu', kernel_initializer = 'he_normal'))
-# model.add(MaxPooling2D(pool_size=(2, 2)))
-#   
-# model.add(Flatten())
-# model.add(Dense(256, activation='relu', kernel_initializer = 'he_normal'))
-# model.add(Dropout(0.3))
-# model.add(Dense(2, activation='softmax', kernel_initializer = 'he_normal'))
+model.add(Conv2D(32, (3, 3), input_shape=input_shape, activation='relu', kernel_initializer = 'he_normal'))
+model.add(MaxPooling2D(pool_size=(2, 2)))
+   
+model.add(Conv2D(64, (3, 3), input_shape=input_shape, activation='relu', kernel_initializer = 'he_normal'))
+model.add(MaxPooling2D(pool_size=(2, 2)))
+   
+model.add(Conv2D(64, (3, 3), input_shape=input_shape, activation='relu', kernel_initializer = 'he_normal'))
+model.add(MaxPooling2D(pool_size=(2, 2)))
+   
+model.add(Flatten())
+model.add(Dense(256, activation='relu', kernel_initializer = 'he_normal'))
+model.add(Dropout(0.3))
+model.add(Dense(1024, activation='relu', kernel_initializer = 'he_normal'))
+model.add(Dropout(0.3))
+model.add(Dense(2, activation='softmax', kernel_initializer = 'he_normal'))
 
 model.summary()
 
@@ -124,6 +130,7 @@ model.fit_generator(
     train_generator,
     steps_per_epoch=nb_train_samples // batch_size,
     epochs=epochs,
+    verbose =2,
     validation_data=validation_generator,
     validation_steps=nb_validation_samples // batch_size)
 
@@ -132,6 +139,7 @@ model.fit_generator(
 model.save_weights('first_try.h5')
 
 
+model.predict_generator(test_generator)
 
 # training_dataset = image.load_img('Food-5K/training/0_0.jpg', target_size=(224, 224))
 # training_dataset = image.img_to_array(training_dataset)
