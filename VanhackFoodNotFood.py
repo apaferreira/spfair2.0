@@ -42,7 +42,7 @@ img_height = 224
 nb_train_samples = 3000
 nb_validation_samples = 1000
 nb_test_samples = 1000
-epochs = 10
+epochs = 50
 batch_size = 16
 
 num_classes = 2
@@ -98,7 +98,6 @@ input_shape = (img_width, img_height, 3)
 model = Sequential()
 model.add(Conv2D(32, (3, 3), input_shape=input_shape, activation='relu', kernel_initializer = 'he_normal'))
 model.add(MaxPooling2D(pool_size=(2, 2)))
-model.add(BatchNormalization())
 
 model.add(Conv2D(32, (3, 3), input_shape=input_shape, activation='relu', kernel_initializer = 'he_normal'))
 model.add(MaxPooling2D(pool_size=(2, 2)))
